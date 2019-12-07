@@ -162,6 +162,8 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	@Nullable
 	protected TransactionAttribute determineTransactionAttribute(AnnotatedElement element) {
 		for (TransactionAnnotationParser annotationParser : this.annotationParsers) {
+			//spring事务：调用SpringTransactionAnnotationParser中的parseTransactionAnnotation方法，
+			//因为在AnnotationTransactionAttributeSource实例化的时候注册了SpringTransactionAnnotationParser
 			TransactionAttribute attr = annotationParser.parseTransactionAnnotation(element);
 			if (attr != null) {
 				return attr;

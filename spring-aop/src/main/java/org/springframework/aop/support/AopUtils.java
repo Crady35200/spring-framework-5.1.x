@@ -225,7 +225,8 @@ public abstract class AopUtils {
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
-
+		//此时的pc表示TransactionAttributeSourcePointcut
+		//pc.getMethodMatcher()返回的正是自身(this)
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
 		if (methodMatcher == MethodMatcher.TRUE) {
 			// No need to iterate the methods if we're matching any method anyway...
@@ -248,6 +249,7 @@ public abstract class AopUtils {
 			for (Method method : methods) {
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
+						//判断方法是否适用于事务增强器，调用TransactionAttributeSourcePointcut中的matches()
 						methodMatcher.matches(method, targetClass)) {
 					return true;
 				}

@@ -42,7 +42,9 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 				PersistenceExceptionTranslator.class.isAssignableFrom(targetClass)) {
 			return false;
 		}
+		//spring事务：tas表示AnnotationTransactionAttributeSource
 		TransactionAttributeSource tas = getTransactionAttributeSource();
+		//调用AbstractFallbackTransactionAttributeSource中的getTransactionAttribute()方法
 		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
 	}
 
