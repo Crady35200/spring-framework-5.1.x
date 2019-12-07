@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # <img src="src/docs/asciidoc/images/spring-framework.png" width="80" height="80"> Spring Framework
 
 This is the home of the Spring Framework: the foundation for all [Spring projects](https://spring.io/projects). Collectively the Spring Framework and the family of Spring projects is often referred to simply as "Spring". 
@@ -28,3 +29,7 @@ Follow [@SpringCentral](https://twitter.com/springcentral), [@SpringFramework](h
 ## License
 
 The Spring Framework is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
+=======
+# spring-framework-5.1.x
+Spring源码学习项目
+>>>>>>> 93abb06772ce79fa989be4c1326d4cb08a01c406
