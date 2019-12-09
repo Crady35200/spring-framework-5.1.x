@@ -225,7 +225,7 @@ public abstract class AopUtils {
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
-		//此时的pc表示TransactionAttributeSourcePointcut
+		//如果是Spring事务则此时的pc表示TransactionAttributeSourcePointcut
 		//pc.getMethodMatcher()返回的正是自身(this)
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
 		if (methodMatcher == MethodMatcher.TRUE) {
@@ -249,7 +249,8 @@ public abstract class AopUtils {
 			for (Method method : methods) {
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
-						//判断方法是否适用于事务增强器，调用TransactionAttributeSourcePointcut中的matches()
+						//判断方法是否适用于事务增强器
+						// 如果是Spring事务则调用TransactionAttributeSourcePointcut中的matches()
 						methodMatcher.matches(method, targetClass)) {
 					return true;
 				}
@@ -287,6 +288,7 @@ public abstract class AopUtils {
 		}
 		else if (advisor instanceof PointcutAdvisor) {
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
+			//判断当前循环的增强器是否适合当前类
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		}
 		else {
@@ -310,6 +312,7 @@ public abstract class AopUtils {
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
 		//首先处理引介增强
 		for (Advisor candidate : candidateAdvisors) {
+			//寻找适合当前类的增强器
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
 				eligibleAdvisors.add(candidate);
 			}

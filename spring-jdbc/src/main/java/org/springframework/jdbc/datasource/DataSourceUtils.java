@@ -181,6 +181,7 @@ public abstract class DataSourceUtils {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Setting JDBC Connection [" + con + "] read-only");
 				}
+				//只读属性设置
 				con.setReadOnly(true);
 			}
 			catch (SQLException | RuntimeException ex) {
@@ -205,6 +206,7 @@ public abstract class DataSourceUtils {
 						definition.getIsolationLevel());
 			}
 			int currentIsolation = con.getTransactionIsolation();
+			//事务隔离级别设置
 			if (currentIsolation != definition.getIsolationLevel()) {
 				previousIsolationLevel = currentIsolation;
 				con.setTransactionIsolation(definition.getIsolationLevel());

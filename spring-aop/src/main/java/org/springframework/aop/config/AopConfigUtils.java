@@ -58,8 +58,10 @@ public abstract class AopConfigUtils {
 
 	static {
 		// Set up the escalation list...
+		//事务后置处理器优先级最低
 		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
 		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
+		//AOP后置处理器优先级最高
 		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);
 	}
 
@@ -145,6 +147,7 @@ public abstract class AopConfigUtils {
 	}
 
 	private static int findPriorityForClass(@Nullable String className) {
+		//i值越大在list中越靠后，优先级越高
 		for (int i = 0; i < APC_PRIORITY_LIST.size(); i++) {
 			Class<?> clazz = APC_PRIORITY_LIST.get(i);
 			if (clazz.getName().equals(className)) {
