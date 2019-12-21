@@ -4,3 +4,4 @@ Spring源码学习项目
 
 # spring AOP源码注释。
 # spring 事务注释。
+# spring bean加载流程。
