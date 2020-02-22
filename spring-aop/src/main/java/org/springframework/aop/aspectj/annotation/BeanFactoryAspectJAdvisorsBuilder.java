@@ -94,6 +94,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							this.beanFactory, Object.class, true, false);
 					//循环所有的beanName并找出对应的增强方法
 					for (String beanName : beanNames) {
+						//不合法的bean则忽略，由子类定义规则，默认返回true
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}

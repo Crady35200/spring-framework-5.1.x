@@ -555,7 +555,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			//根据bean使用对应的策略创建新的实例-将beanDefinition转换成BeanWrapper
+			//实例化bean，根据bean使用对应的策略创建新的实例-将beanDefinition转换成BeanWrapper
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		final Object bean = instanceWrapper.getWrappedInstance();
@@ -630,7 +630,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					/**
 					 * 因为bean创建后其所依赖的bean一定是已经创建的，
 					 * actualDependentBeans不为空则表示当前bean创建后期依赖的bean
-					 * 缺没有全部创建完成，也就是说存在循环依赖
+					 * 确没有全部创建完成，也就是说存在循环依赖
 					 **/
 					if (!actualDependentBeans.isEmpty()) {
 						throw new BeanCurrentlyInCreationException(beanName,

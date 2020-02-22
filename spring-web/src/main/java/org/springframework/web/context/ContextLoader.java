@@ -359,7 +359,7 @@ public class ContextLoader {
 			}
 		}
 		else {
-			//解析获取resources/org.springframwork.web.context.ContextLoader.properties
+			//解析获取resources/org.springframework.web.context.ContextLoader.properties
 			//中配置的类(通过当前类静态模块读取)。
 			contextClassName = defaultStrategies.getProperty(WebApplicationContext.class.getName());
 			try {

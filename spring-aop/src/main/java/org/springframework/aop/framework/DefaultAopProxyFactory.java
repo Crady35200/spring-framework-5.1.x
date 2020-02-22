@@ -53,7 +53,7 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 		 *    了解AOP代理如何优化，否则不推荐用户使用这个设置。目前这个属性仅用于CGLIB代理，对于JDK代
 		 *    理(默认代理)无效。
 		 * 2、config.isProxyTargetClass()。proxyTargetClass这个属性设置为true时目标类本身被代理
-		 *    而不是目标类的接口。如果这个属性被设置为true的话，CGLIB代理将会被创建，这是方式：
+		 *    而不是目标类的接口。如果这个属性被设置为true的话，CGLIB代理将会被创建，使用方式：
 		 *    a、xml设置。<aop:aspectj-autoproxy-proxy-target-class="true"/>。
 		 *    b、注解方式设置。@EnableAspectJAutoProxy(proxyTargetClass = true)。
 		 * 3、hasNoUserSuppliedProxyInterfaces(config)。是否存在代理接口。
@@ -68,7 +68,7 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 				throw new AopConfigException("TargetSource cannot determine target class: " +
 						"Either an interface or a target is required for proxy creation.");
 			}
-			//如果实现类接口或者目标类是本身就是代理类则使用JDK动态代理
+			//如果目标类是接口或者目标类是本身就是代理类则使用JDK动态代理
 			if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
 				return new JdkDynamicAopProxy(config);
 			}

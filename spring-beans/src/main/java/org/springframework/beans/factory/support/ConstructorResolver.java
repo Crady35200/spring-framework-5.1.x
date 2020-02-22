@@ -127,7 +127,7 @@ class ConstructorResolver {
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
-		else {
+		else {//如果在getBean的时候没有指定则尝试从配置文件中解析
 			Object[] argsToResolve = null;
 			//尝试从缓存中取
 			synchronized (mbd.constructorArgumentLock) {
@@ -207,7 +207,7 @@ class ConstructorResolver {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 				/**
 				 * 如果已经找到选用的构造函数或者需要的参数个数小于当前构造函数参数个数
-				 * 则终止，因为已经安装参数个数降序排列
+				 * 则终止，因为已经按照参数个数降序排列
 				 */
 				if (constructorToUse != null && argsToUse != null && argsToUse.length > paramTypes.length) {
 					// Already found greedy constructor that can be satisfied ->
@@ -223,7 +223,7 @@ class ConstructorResolver {
 				if (resolvedValues != null) {
 					//有参数则根据值构造对应参数类型的参数
 					try {
-						//朱时尚获取参数名称
+						//注释上获取参数名称
 						String[] paramNames = ConstructorPropertiesChecker.evaluate(candidate, paramTypes.length);
 						if (paramNames == null) {
 							//获取参数名称探索器

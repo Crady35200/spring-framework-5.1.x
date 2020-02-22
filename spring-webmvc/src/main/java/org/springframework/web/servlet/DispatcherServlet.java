@@ -1421,8 +1421,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @return the view name (or {@code null} if no default found)
 	 * @throws Exception if view name translation failed
 	 */
-	@Nullable
-	protected String getDefaultViewName(HttpServletRequest request) throws Exception {
+i	protected String getDefaultViewName(HttpServletRequest request) throws Exception {
 		return (this.viewNameTranslator != null ? this.viewNameTranslator.getViewName(request) : null);
 	}
 
