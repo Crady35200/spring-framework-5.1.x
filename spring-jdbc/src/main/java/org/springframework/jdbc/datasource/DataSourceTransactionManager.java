@@ -239,7 +239,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		//如果当前线程已经记录数据库连接则使用原有连接
 		ConnectionHolder conHolder =
 				(ConnectionHolder) TransactionSynchronizationManager.getResource(obtainDataSource());
-		//false标识非新建连接
+		//false表示非新建连接
 		txObject.setConnectionHolder(conHolder, false);
 		return txObject;
 	}
