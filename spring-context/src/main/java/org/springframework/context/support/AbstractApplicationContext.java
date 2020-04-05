@@ -650,6 +650,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		//为beanfactory生成唯一序列化id，beanfactory已经在GenericApplicationContext构造函数
+		// 中初始化了，refreshBeanFactory的逻辑在AbstractApplicationContext的实现类
+		// GenericApplicationContext中
 		refreshBeanFactory();
 		return getBeanFactory();
 	}
@@ -687,7 +690,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// BeanFactory interface not registered as resolvable type in a plain factory.
 		// MessageSource registered (and found for autowiring) as a bean.
-		//设置几个自动装配的特殊规则
+		//设置几个自动装配的特殊规则,注册可以自动装配的组件，就是可以在任何组件中允许自动注入的组件
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
@@ -705,7 +708,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Register default environment beans.
-		//添加默认的系统环境bean
+		//添加默认的系统环境bean, 给beanfactory容器中注册组件ConfigurableEnvironment、
+		// systemProperties、systemEnvironment
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
 		}
@@ -887,7 +891,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
-		//ConversionService设置
+		//ConversionService设置,组件转换器相关
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(

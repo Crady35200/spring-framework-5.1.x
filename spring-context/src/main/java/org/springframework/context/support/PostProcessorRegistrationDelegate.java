@@ -279,7 +279,7 @@ final class PostProcessorRegistrationDelegate {
 
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
 		// moving it to the end of the processor chain (for picking up proxies etc).
-		//添加ApplicationListener探测器
+		//添加ApplicationListener探测器,用于Bean创建完时检查是否是ApplicationListener
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
 	}
 

@@ -296,11 +296,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			try {
-				//合并父类中的属性
+				//合并父类中的属性,主要解决 Bean 继承时子类合并父类公共属性问题
 				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.
+				//获取当前 Bean 所有依赖 Bean 的名称
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
@@ -334,29 +335,39 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
+					//获取给定 Bean 的实例对象
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 				//原型模式创建bean
 				else if (mbd.isPrototype()) {
 					// It's a prototype -> create a new instance.
+					//原型模式(Prototype)是每次都会创建一个新的对象
 					Object prototypeInstance = null;
-					try {
+					try {//回调 beforePrototypeCreation 方法， 默认的功能是注册当前创//建的原型对象
 						beforePrototypeCreation(beanName);
+						//创建指定 Bean 对象实例
 						prototypeInstance = createBean(beanName, mbd, args);
 					}
 					finally {
+						//回调 afterPrototypeCreation 方法， 默认的功能告诉 IoC 容器指定 Bean 的原型对象不再创建
 						afterPrototypeCreation(beanName);
 					}
 					bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
 
+				/**
+				 * 要创建的 Bean 既不是单例模式，也不是原型模式，则根据 Bean定义资源中
+				 * 配置的生命周期范围，选择实例化Bean的合适方法，这种在Web应用程序中
+				 * 比较常用，如：request、session、application等生命周期
+				 */
 				else {
 					String scopeName = mbd.getScope();
 					final Scope scope = this.scopes.get(scopeName);
+					//Bean 定义资源中没有配置生命周期范围， 则 Bean 定义不合法
 					if (scope == null) {
 						throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
 					}
-					try {
+					try {//这里又使用了一个匿名内部类， 获取一个指定生命周期范围的实例
 						Object scopedInstance = scope.get(beanName, () -> {
 							beforePrototypeCreation(beanName);
 							try {
@@ -366,6 +377,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 								afterPrototypeCreation(beanName);
 							}
 						});
+						//获取给定 Bean 的实例对象
 						bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
 					}
 					catch (IllegalStateException ex) {
