@@ -276,7 +276,7 @@ public class ContextLoader {
 			// Store context in local instance variable, to guarantee that
 			// it is available on ServletContext shutdown.
 			if (this.context == null) {
-				//初始化context
+				//初始化context，默认是XmlWebApplicationContext
 				this.context = createWebApplicationContext(servletContext);
 			}
 			if (this.context instanceof ConfigurableWebApplicationContext) {
@@ -290,6 +290,7 @@ public class ContextLoader {
 						ApplicationContext parent = loadParentContext(servletContext);
 						cwac.setParent(parent);
 					}
+					//刷新web容器,主要是初始化XmlWebApplicationContext中的beanFactory
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
 				}
 			}
@@ -361,6 +362,7 @@ public class ContextLoader {
 		else {
 			//解析获取resources/org.springframework.web.context.ContextLoader.properties
 			//中配置的类(通过当前类静态模块读取)。
+			//默认使用XmlWebApplicationContext
 			contextClassName = defaultStrategies.getProperty(WebApplicationContext.class.getName());
 			try {
 				return ClassUtils.forName(contextClassName, ContextLoader.class.getClassLoader());
@@ -378,18 +380,23 @@ public class ContextLoader {
 			// -> assign a more useful id based on available information
 			String idParam = sc.getInitParameter(CONTEXT_ID_PARAM);
 			if (idParam != null) {
+				//替换WebApplicationContext中的ID，起一个更有意义的名字
 				wac.setId(idParam);
 			}
 			else {
 				// Generate default id...
+				//默认生成一个ID，规则为：WebApplicationContext全限定名+":"+项目名称
 				wac.setId(ConfigurableWebApplicationContext.APPLICATION_CONTEXT_ID_PREFIX +
 						ObjectUtils.getDisplayString(sc.getContextPath()));
 			}
 		}
 
+		//将ServletContext设置到web容器
 		wac.setServletContext(sc);
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
+			//设置Spring容器的配置文件路径，如果没有设置则在XMLWebApplicationContext中
+			// 默认为/WEB-INF/applicationContext.xml
 			wac.setConfigLocation(configLocationParam);
 		}
 
@@ -402,6 +409,7 @@ public class ContextLoader {
 		}
 
 		customizeContext(sc, wac);
+		//调用Spring容器的refresh()方法，记载配置文件
 		wac.refresh();
 	}
 

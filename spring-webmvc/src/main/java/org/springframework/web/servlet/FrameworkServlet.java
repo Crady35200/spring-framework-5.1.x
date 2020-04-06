@@ -526,6 +526,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 
 		try {
+			// 初始化WebApplicationContext，并调用子类（DispatcherServlet）的onRefresh(wac)方法
 			this.webApplicationContext = initWebApplicationContext();
 			//空实现，设计为子类覆盖扩展
 			initFrameworkServlet();
@@ -563,6 +564,9 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
 
+		// 判断容器是否由编程式传入（即是否已经存在了容器实例），存在的话直接赋值给wac，
+		// 给springMVC容器设置父容器最后调用刷新函数configureAndRefreshWebApplicationContext(wac)，
+		// 作用是把Spring MVC配置文件的配置信息加载到容器中去
 		if (this.webApplicationContext != null) {
 			// A context instance was injected at construction time -> use it
 			wac = this.webApplicationContext;
@@ -581,6 +585,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 				}
 			}
 		}
+		// 在ServletContext中寻找是否有Spring MVC容器，初次运行是没有的，
+		// Spring MVC初始化完毕ServletContext就有了Spring MVC容器
 		if (wac == null) {
 			// No context instance was injected at construction time -> see if one
 			// has been registered in the servlet context. If one exists, it is assumed
@@ -589,12 +595,15 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			//根据contextAttribute属性加载WebApplicationContext
 			wac = findWebApplicationContext();
 		}
+		//当wac既没有没被编程式注册到容器中的，也没在ServletContext找得到，此时就要新建一个Spring MVC容器
 		if (wac == null) {
 			// No context instance is defined for this servlet -> create a local one
 			//创建WebApplicationContext
 			wac = createWebApplicationContext(rootContext);
 		}
 
+		// 到这里Spring MVC容器已经创建完毕，接着真正调用DispatcherServlet的初始化方法onRefresh(wac)
+		// 此处仍是模板模式的应用
 		if (!this.refreshEventReceived) {
 			// Either the context is not a ConfigurableApplicationContext with refresh
 			// support or the context injected at construction time had already been
@@ -668,6 +677,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		wac.setEnvironment(getEnvironment());
 		//parent为在ContextLoaderListener中创建的容器
 		wac.setParent(parent);
+		// 加载Spring MVC的配置信息，如：bean注入、注解、扫描等等
 		String configLocation = getContextConfigLocation();
 		if (configLocation != null) {
 			wac.setConfigLocation(configLocation);
