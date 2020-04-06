@@ -59,6 +59,10 @@ public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {
+			//直接调用MethodInvocation的proceed方法从proceed()方法中我们知道
+			// dm.interceptor.invoke(this)传过来的参数就是ReflectiveMethodInvocation执行器本身
+			//这里又直接调用了ReflectiveMethodInvocation的proceed()方法
+			//此时执行链卡在这里继续执行下一个拦截器
 			return mi.proceed();
 		}
 		catch (Throwable ex) {

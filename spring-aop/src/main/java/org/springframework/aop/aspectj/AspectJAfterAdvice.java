@@ -44,9 +44,12 @@ public class AspectJAfterAdvice extends AbstractAspectJAdvice
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {
+			//AfterReturningAdviceInterceptor还是直接调用mi.proceed()，
+			// 又回到了ReflectiveMethodInvocation的proceed()方法中
+			//此时执行链卡在这里继续执行下一个拦截器
 			return mi.proceed();
 		}
-		finally {//激活增强方法
+		finally {//激活增强方法,执行链回退时执行后置增强
 			invokeAdviceMethod(getJoinPointMatch(), null, null);
 		}
 	}

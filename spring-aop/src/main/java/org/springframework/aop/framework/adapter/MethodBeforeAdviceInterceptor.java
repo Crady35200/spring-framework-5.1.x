@@ -52,7 +52,13 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		//终于开始做事了，调用增强器的before方法，明显是通过反射的方式调用
+		//到这里增强方法before的业务逻辑执行
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
+		//又调用了调用MethodInvocation的proceed方法
+		//我们知道这是最后一个拦截器了，此时this.currentInterceptorIndex ==
+		// this.interceptorsAndDynamicMethodMatchers.size() - 1应该为true了，
+		// 那么就会执行 return invokeJoinpoint();，也就是执行bean中的目标方法
 		return mi.proceed();
 	}
 

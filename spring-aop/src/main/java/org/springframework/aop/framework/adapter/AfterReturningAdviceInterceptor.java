@@ -52,6 +52,9 @@ public class AfterReturningAdviceInterceptor implements MethodInterceptor, After
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		//AfterReturningAdviceInterceptor还是直接调用mi.proceed()，
+		// 又回到了ReflectiveMethodInvocation的proceed()方法中
+		//此时执行链卡在这里继续执行下一个拦截器
 		Object retVal = mi.proceed();
 		this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());
 		return retVal;
