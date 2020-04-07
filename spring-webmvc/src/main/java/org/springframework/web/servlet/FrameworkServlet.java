@@ -562,9 +562,11 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		//获取之前在ContextLoaderListener中创建的XmlWebApplicationContext
 		WebApplicationContext rootContext =
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+		//创建SpringMVC容器---子容器
 		WebApplicationContext wac = null;
 
-		// 判断容器是否由编程式传入（即是否已经存在了容器实例），存在的话直接赋值给wac，
+		// 通过判断this.webApplicationContext是否为null来知道this.webApplicationContext是否
+		//是通过构造函数创建的(FrameworkServlet提供了注入一个容器的构造函数)，也就是已启动就创建了
 		// 给springMVC容器设置父容器最后调用刷新函数configureAndRefreshWebApplicationContext(wac)，
 		// 作用是把Spring MVC配置文件的配置信息加载到容器中去
 		if (this.webApplicationContext != null) {
@@ -578,6 +580,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 					if (cwac.getParent() == null) {
 						// The context instance was injected without an explicit parent -> set
 						// the root application context (if any; may be null) as the parent
+						//设置父容器
 						cwac.setParent(rootContext);
 					}
 					//刷新上下文环境
@@ -585,7 +588,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 				}
 			}
 		}
-		// 在ServletContext中寻找是否有Spring MVC容器，初次运行是没有的，
+		// 没有被初始化，在ServletContext中寻找是否有Spring MVC容器，初次运行是没有的，
 		// Spring MVC初始化完毕ServletContext就有了Spring MVC容器
 		if (wac == null) {
 			// No context instance was injected at construction time -> see if one
@@ -598,23 +601,26 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		//当wac既没有没被编程式注册到容器中的，也没在ServletContext找得到，此时就要新建一个Spring MVC容器
 		if (wac == null) {
 			// No context instance is defined for this servlet -> create a local one
-			//创建WebApplicationContext
+			//创建WebApplicationContext,并注册刷新SpringMVC全局变量的监听器
 			wac = createWebApplicationContext(rootContext);
 		}
 
 		// 到这里Spring MVC容器已经创建完毕，接着真正调用DispatcherServlet的初始化方法onRefresh(wac)
 		// 此处仍是模板模式的应用
+		//如果在创建容器时(createWebApplicationContext)注册的监听器中没有刷新则在此处刷新
 		if (!this.refreshEventReceived) {
 			// Either the context is not a ConfigurableApplicationContext with refresh
 			// support or the context injected at construction time had already been
 			// refreshed -> trigger initial onRefresh manually here.
 			synchronized (this.onRefreshMonitor) {
+				//刷新在SpringMVC中需要使用的全局变量
 				onRefresh(wac);
 			}
 		}
 
 		if (this.publishContext) {
 			// Publish the context as a servlet context attribute.
+			//属性名称：FrameworkServlet.class.getName() + ".CONTEXT." + servlet名称
 			String attrName = getServletContextAttributeName();
 			getServletContext().setAttribute(attrName, wac);
 		}
@@ -705,6 +711,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		wac.setServletContext(getServletContext());
 		wac.setServletConfig(getServletConfig());
 		wac.setNamespace(getNamespace());
+		//注册容器刷新监听器监听器，待spring容器刷新完成后初始化SpringMVC所使用到的全局变量
 		wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));
 
 		// The wac environment's #initPropertySources will be called in any case when the context
@@ -856,8 +863,10 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @param event the incoming ApplicationContext event
 	 */
 	public void onApplicationEvent(ContextRefreshedEvent event) {
+		//设置SpringMVC容器刷新过的标记
 		this.refreshEventReceived = true;
 		synchronized (this.onRefreshMonitor) {
+			//刷新SpringMVC中所使用到的全局变量
 			onRefresh(event.getApplicationContext());
 		}
 	}
@@ -913,7 +922,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	@Override
 	protected final void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		//对于不同的请求方式SpringMVC并没有做特殊的处理都同意调用processRequest
 		processRequest(request, response);
 	}
 
@@ -1034,11 +1043,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 
 		finally {
+			//请求处理完成后恢复线程到最初状态
 			resetContextHolders(request, previousLocaleContext, previousAttributes);
 			if (requestAttributes != null) {
 				requestAttributes.requestCompleted();
 			}
 			logResult(request, response, failureCause, asyncManager);
+			//发送事件
 			publishRequestHandledEvent(request, response, startTime, failureCause);
 		}
 	}

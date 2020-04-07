@@ -1054,12 +1054,14 @@ public class DispatcherServlet extends FrameworkServlet {
 				String method = request.getMethod();
 				boolean isGet = "GET".equals(method);
 				if (isGet || "HEAD".equals(method)) {
+					//获取上一次服务器内容更新的时间，SimpleControllerHandlerAdapter.getLastModified
 					long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
+					//检测当前请求的if-modified-since时间和最近一次服务器内容变更的时间就行比较
 					if (new ServletWebRequest(request, response).checkNotModified(lastModified) && isGet) {
 						return;
 					}
 				}
-				//前置拦截器调用
+				//前置拦截器调用，调用所有拦截器的preHandle()
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
@@ -1073,7 +1075,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 				//视图名称转换应用于需要添加前缀后缀的情况
 				applyDefaultViewName(processedRequest, mv);
-				//后置拦截器调用
+				//后置拦截器调用，调用所有拦截器的postHandle()
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1286,7 +1288,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			throw new NoHandlerFoundException(request.getMethod(), getRequestUri(request),
 					new ServletServerHttpRequest(request).getHeaders());
 		}
-		else {
+		else {//没有找到处理器映射器则抛404错误
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
@@ -1298,7 +1300,9 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	protected HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
 		if (this.handlerAdapters != null) {
+			//遍历所有的适配器来获取最合适的适配器
 			for (HandlerAdapter adapter : this.handlerAdapters) {
+				//判断是否合适，默认SimpleControllerHandlerAdapter
 				if (adapter.supports(handler)) {
 					return adapter;
 				}
@@ -1380,7 +1384,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		String viewName = mv.getViewName();
 		if (viewName != null) {
 			// We need to resolve the view name.
-			//视图解析器解析
+			//视图解析器解析，解析视图名称返回视图
 			view = resolveViewName(viewName, mv.getModelInternal(), locale, request);
 			if (view == null) {
 				throw new ServletException("Could not resolve view with name '" + mv.getViewName() +
@@ -1404,7 +1408,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (mv.getStatus() != null) {
 				response.setStatus(mv.getStatus().value());
 			}
-			//视图渲染
+			//视图渲染AbstractView
 			view.render(mv.getModelInternal(), request, response);
 		}
 		catch (Exception ex) {
