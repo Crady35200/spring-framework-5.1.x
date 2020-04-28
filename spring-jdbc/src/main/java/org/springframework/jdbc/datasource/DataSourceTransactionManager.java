@@ -262,10 +262,12 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			//当前线程不存在事务或者对于事务同步设置为true的都需要新获取连接
 			if (!txObject.hasConnectionHolder() ||
 					txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
+				//从数据源获取数据库链接
 				Connection newCon = obtainDataSource().getConnection();
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
+				//将获取的数据库连接绑定到当前线程
 				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
 			}
 
@@ -286,7 +288,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				}
 				con.setAutoCommit(false);
 			}
-
+			//如果有需要设置事务只读属性
 			prepareTransactionalConnection(con, definition);
 			//设置当前线程是否存在事务的依据
 			txObject.getConnectionHolder().setTransactionActive(true);

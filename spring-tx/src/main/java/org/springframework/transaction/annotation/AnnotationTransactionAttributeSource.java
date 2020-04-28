@@ -101,7 +101,7 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 				this.annotationParsers.add(new Ejb3TransactionAnnotationParser());
 			}
 		}
-		else {
+		else {//添加SpringTransactionAnnotationParser解析器解析@Transactional注解属性
 			this.annotationParsers = Collections.singleton(new SpringTransactionAnnotationParser());
 		}
 	}

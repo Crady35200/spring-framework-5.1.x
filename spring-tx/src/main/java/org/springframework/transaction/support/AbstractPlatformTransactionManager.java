@@ -863,7 +863,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 					if (status.isDebug()) {
 						logger.debug("Rolling back transaction to savepoint");
 					}
-					//如果有保存点，也就是当前事务为单独的线程则会推到保存点
+					//如果有保存点，也就是当前事务为单独的线程则会退到保存点
 					status.rollbackToHeldSavepoint();
 				}
 				else if (status.isNewTransaction()) {
