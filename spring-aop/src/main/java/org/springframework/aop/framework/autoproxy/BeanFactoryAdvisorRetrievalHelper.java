@@ -90,7 +90,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 					}
 				}
 				else {
-					try {
+					try {//事务的增强器BeanFactoryTransactionAttributeSourceAdvisor在此获取
 						advisors.add(this.beanFactory.getBean(name, Advisor.class));
 					}
 					catch (BeanCreationException ex) {

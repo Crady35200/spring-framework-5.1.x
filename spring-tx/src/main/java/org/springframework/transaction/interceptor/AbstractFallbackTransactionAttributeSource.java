@@ -96,6 +96,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 
 		// First, see if we have a cached value.
 		Object cacheKey = getCacheKey(method, targetClass);
+		//此处获取的是RuleBasedTransactionAttribute
 		TransactionAttribute cached = this.attributeCache.get(cacheKey);
 		if (cached != null) {
 			// Value will either be canonical value indicating there is no transaction attribute,
@@ -109,7 +110,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		}
 		else {
 			// We need to work it out.
-			//第一次缓存中没有，需要创建
+			//第一次缓存中没有，需要创建，@Transactional注解解析在这里
 			TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
 			if (txAttr == null) {
@@ -161,7 +162,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
 		// First try is the method in the target class.
-		//查看方法中是否存在事务声明
+		//查看方法中是否存在事务声明，@Transactional注解在这里
 		//调用AnnotationTransactionAttributeSource中的findTransactionAttribute()方法
 		TransactionAttribute txAttr = findTransactionAttribute(specificMethod);
 		if (txAttr != null) {
