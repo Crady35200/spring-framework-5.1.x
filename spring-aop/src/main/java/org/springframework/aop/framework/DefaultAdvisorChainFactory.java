@@ -80,6 +80,8 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					}
 					if (match) {
 						//如果能匹配，就将advisor封装成MethodInterceptor加入到interceptorList中
+						//AOP中的5个增前期只有AspectJMethodBeforeAdvice，AspectJAfterReturningAdvice
+						//需要包装，其他的advice本身就是MethodInterceptor类型的了
 						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
 						if (mm.isRuntime()) {
 							// Creating a new object instance in the getInterceptors() method

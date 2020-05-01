@@ -254,6 +254,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			 * 判断当前bean是否可以被代理，然后存入advisedBeans
 			 * 判断是不是基础的Bean（Advice、PointCut、Advisor、AopInfrastructureBean）是就直接跳过
 			 * 判断是不是应该跳过 (AOP解析直接解析出我们的切面信息(并且把我们的切面信息进行缓存)，而事务在这里是不会解析的)
+			 * apo被@Aspect标记的类在启动类运行到这里的时候在AspectJAwareAdvisorAutoProxyCreator.shouldSkip中加载各个切点
 			 */
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
