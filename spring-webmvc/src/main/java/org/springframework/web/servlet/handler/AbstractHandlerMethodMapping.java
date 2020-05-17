@@ -382,26 +382,36 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	@Nullable
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		List<Match> matches = new ArrayList<>();
+		// 从mappingRegistry的urlLookup 属性中获取 lookupPath 所对应的
+		// LinkedList（主要保存包括映射条件等配置信息）
 		List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
 		if (directPathMatches != null) {
+			// 如果从lookupPath集合中成功获取到请求路径所对应的映射信息则将其封装后保存到matches列表中
 			addMatchingMappings(directPathMatches, matches, request);
 		}
 		if (matches.isEmpty()) {
 			// No choice but to go through all mappings...
+			//如果从urlLookup集合中没有获取到对应的映射信息,则只能将mappingRegistry中的所有映射信息都塞到matches中
 			addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
 		}
 
 		if (!matches.isEmpty()) {
 			Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
+			//对获取到的匹配的信息进行排序
 			matches.sort(comparator);
+			// 默认获取首元素做为最匹配元素
 			Match bestMatch = matches.get(0);
+			// 下面针对多个处理器匹配请求的情况
 			if (matches.size() > 1) {
 				if (logger.isTraceEnabled()) {
 					logger.trace(matches.size() + " matching mappings: " + matches);
 				}
+				// 如果当前请求为CORS跨域pre-flight请求则直接返回PREFLIGHT_AMBIGUOUS_MATCH
 				if (CorsUtils.isPreFlightRequest(request)) {
 					return PREFLIGHT_AMBIGUOUS_MATCH;
 				}
+				// 获取matches列表中的第二个匹配者进行比较，如果信息相同则直接抛异常
+				// 这里就是处理了当两个方法同时完全匹配同一个请求的情况
 				Match secondBestMatch = matches.get(1);
 				if (comparator.compare(bestMatch, secondBestMatch) == 0) {
 					Method m1 = bestMatch.handlerMethod.getMethod();
@@ -411,7 +421,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 							"Ambiguous handler methods mapped for '" + uri + "': {" + m1 + ", " + m2 + "}");
 				}
 			}
+			// 将刚刚获取的最匹配处理者的 handlerMethod 存储到请求中
 			request.setAttribute(BEST_MATCHING_HANDLER_ATTRIBUTE, bestMatch.handlerMethod);
+			// 当获取到匹配的处理方法时为 request 属性中添加一个键值对
+			// 键为 PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE 值为 lookupPath
+			// 并解析请求中的 URI 模板变量、矩阵变量和可延长的媒体类型将其添加到request的attribute中
 			handleMatch(bestMatch.mapping, lookupPath, request);
 			return bestMatch.handlerMethod;
 		}
