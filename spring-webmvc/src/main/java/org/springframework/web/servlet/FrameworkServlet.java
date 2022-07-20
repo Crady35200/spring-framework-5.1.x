@@ -922,7 +922,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	@Override
 	protected final void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		//对于不同的请求方式SpringMVC并没有做特殊的处理都同意调用processRequest
+		//对于不同的请求方式SpringMVC并没有做特殊的处理都统一调用processRequest
 		processRequest(request, response);
 	}
 
